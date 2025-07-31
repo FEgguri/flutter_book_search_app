@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_book_search_app/ui/home/home_view_model.dart';
 import 'package:flutter_book_search_app/ui/home/widgets/home_bottom_sheet.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class HomePage extends StatefulWidget {
+class HomePage extends ConsumerStatefulWidget {
   HomePage({super.key});
   @override
-  State<HomePage> createState() => _HomePageState();
+  ConsumerState<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends ConsumerState<HomePage> {
   TextEditingController textEditingController = TextEditingController();
 
 //컨트롤러사용시 반드시 디스포즈 사용
@@ -19,11 +21,14 @@ class _HomePageState extends State<HomePage> {
 
   //내부에 구현되어있는 TextEditingController  초기화
   void onSearch(String text) {
+    //TODO 홈뷰모델의 서치북스 메서드 호출
+    ref.read(homeviewModelProvider.notifier).searchBooks(text);
     print('onSearch');
   }
 
   @override
   Widget build(BuildContext context) {
+    final homeState = ref.watch(homeviewModelProvider);
     return GestureDetector(
         onTap: () {
           FocusScope.of(context).unfocus();
@@ -65,22 +70,23 @@ class _HomePageState extends State<HomePage> {
           ),
           body: GridView.builder(
             padding: EdgeInsets.all(20),
-            itemCount: 10,
+            itemCount: homeState.books.length,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 3,
                 childAspectRatio: 3 / 4,
                 crossAxisSpacing: 10,
                 mainAxisSpacing: 10),
             itemBuilder: (context, index) {
+              final book = homeState.books[index];
               return GestureDetector(
                   onTap: () {
                     showModalBottomSheet(
                         context: context,
                         builder: (context) {
-                          return HomeBottomSheet();
+                          return HomeBottomSheet(book);
                         });
                   },
-                  child: Image.network('https://picsum.photos/200/300'));
+                  child: Image.network(book.image));
             },
           ),
         ));
