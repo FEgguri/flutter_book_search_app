@@ -5,7 +5,7 @@ import 'package:flutter_book_search_app/data/model/book.dart';
 import 'package:http/http.dart';
 
 class BookRepository {
-  Future<List<Book>> searchBook(String query) async {
+  Future<List<Book>> searchBooks(String query) async {
     final client = Client();
     final response = await client.get(
       Uri.parse('https://openapi.naver.com/v1/search/book.json?query=$query'),
